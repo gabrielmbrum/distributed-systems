@@ -1,0 +1,1 @@
+mv G*.pdf "aula de hoje.pdf"

@@ -1,15 +1,20 @@
 from pypdf import PdfReader, PdfWriter
+from datetime import date
 
 
-def extrair_pagina(pdf_original, pdf_destino, numero_da_pagina):
+def extrair_pagina(pdf_original):
+    # Define o nome do arquivo como "GABRIEL BRUM - Aula {dia do mes} do {mes}"
+    hoje = date.today()
+    pdf_destino = f"GABRIEL BRUM - Aula {hoje.day} do {hoje.month}.pdf"
+
     # Abre o arquivo PDF original
     leitor = PdfReader(pdf_original)
 
     # Cria um novo arquivo PDF na memória
     gravador = PdfWriter()
 
-    # Adiciona a página escolhida (ajusta para contagem começando em 0)
-    pagina = leitor.pages[numero_da_pagina - 1]
+    # Pega a última página do PDF original)
+    pagina = leitor.pages[len(leitor.pages) - 1]
     gravador.add_page(pagina)
 
     # Salva o novo arquivo com a página extraída
@@ -19,4 +24,4 @@ def extrair_pagina(pdf_original, pdf_destino, numero_da_pagina):
 
 # Exemplo de uso:
 # Extrai a página 3 do arquivo "documento.pdf" e salva como "pagina_3.pdf"
-extrair_pagina("aula_26_08.pdf", "GABRIEL BRUM - aula_26_08.pdf", 3)
+extrair_pagina("aulas.pdf")
