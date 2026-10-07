@@ -5,7 +5,7 @@ from datetime import date
 def extrair_pagina(pdf_original):
     # Define o nome do arquivo como "GABRIEL BRUM - Aula {dia do mes} do {mes}"
     hoje = date.today()
-    pdf_destino = f"aula de hoje.pdf"
+    pdf_destino = f"aula_de_hoje.pdf"
 
     # Abre o arquivo PDF original
     leitor = PdfReader(pdf_original)
@@ -24,4 +24,5 @@ def extrair_pagina(pdf_original):
 
 # Exemplo de uso:
 # Extrai a página 3 do arquivo "documento.pdf" e salva como "pagina_3.pdf"
+# extrair_pagina("aulas.pdf")
 extrair_pagina("aulas.pdf")
