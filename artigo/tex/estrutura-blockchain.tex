@@ -1,0 +1,35 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        bloco/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black!70,
+            fill=blue!10,
+            line width=0.8pt,
+            inner sep=6pt,
+            align=center,
+            font=\small,
+            text width=2.8cm,
+            minimum height=2.8cm
+        },
+        arrow/.style = {
+            thick,
+            ->,
+            >={Stealth[length=2.5mm]}
+        }
+    ]
+
+        \node (b1) [bloco] {\textbf{Bloco $N-1$}\\[3pt] \textit{Cabeçalho:}\\ \textit{hash} anterior\\ \textit{nonce}\\ raiz de Merkle\\[3pt] \textit{Transações}};
+        \node (b2) [bloco, right=1.4cm of b1] {\textbf{Bloco $N$}\\[3pt] \textit{Cabeçalho:}\\ \textit{hash} anterior\\ \textit{nonce}\\ raiz de Merkle\\[3pt] \textit{Transações}};
+        \node (b3) [bloco, right=1.4cm of b2] {\textbf{Bloco $N+1$}\\[3pt] \textit{Cabeçalho:}\\ \textit{hash} anterior\\ \textit{nonce}\\ raiz de Merkle\\[3pt] \textit{Transações}};
+
+        \draw [arrow] (b2.west) -- node[above, font=\scriptsize\itshape] {\textit{hash}} (b1.east);
+        \draw [arrow] (b3.west) -- node[above, font=\scriptsize\itshape] {\textit{hash}} (b2.east);
+
+    \end{tikzpicture}%
+    }
+    \caption{Estrutura de uma cadeia de blocos: cada bloco contém um cabeçalho, com o \textit{hash} do bloco anterior e a raiz da árvore de Merkle, e o conjunto de transações. O encadeamento por \textit{hash} torna detectável a adulteração de blocos passados.}
+    \label{fig:estrutura_blocos}
+\end{figure}

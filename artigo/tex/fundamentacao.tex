@@ -1,0 +1,125 @@
+\section{Fundamentação Teórica}
+\label{sec:fundamentacao}
+
+Esta seção apresenta a base conceitual do \textit{Blockchain} necessária para responder à QP1 (subseção \ref{subsec:qp}). Parte-se de uma visão geral dos princípios da tecnologia, segue-se para sua arquitetura e para os fundamentos criptográficos que sustentam o encadeamento de blocos, e discute-se o consenso, ponto em que o \textit{Blockchain} se conecta de forma mais direta com a teoria de sistemas distribuídos. A seção termina com as propriedades resultantes e os \textit{trade-offs} de projeto, que preparam a análise dos domínios financeiro e de saúde.
+
+\subsection{Visão Geral e Princípios}
+\label{subsec:visao-geral}
+
+O \textit{Blockchain} pode ser entendido como um banco de dados que registra todas as transações ocorridas em uma rede e é replicado em cada um de seus participantes, constituindo um livro-razão distribuído que dispensa uma autoridade central para estabelecer a confiança entre as partes ou liquidar as transações \cite{Xiao2020}. O problema que ele resolve é criar um armazenamento distribuído de documentos com marca temporal no qual nenhuma parte consiga adulterar o conteúdo ou os registros de data e hora sem ser detectada \cite{di2017blockchain}.
+
+Esse problema é distinto dos que as assinaturas digitais resolvem. Uma assinatura estabelece um vínculo verificável entre uma parte e um documento, garantindo autenticação, integridade e não repúdio, mas nada garante sobre o momento em que o documento foi assinado, de modo que a marca temporal depende da confiança em quem assinou \cite{di2017blockchain}. Em transações financeiras e contratos, a ordem dos eventos precisa ser certificada de forma independente para que seja auditável \cite{di2017blockchain}. A solução tradicional é um terceiro confiável central, como a casa da moeda (\textit{mint}) descrita por Nakamoto, que verifica cada transação contra o gasto duplo e faz com que todo o sistema dependa da instituição que o opera \cite{nakamoto2008bitcoin}. O \textit{Blockchain} substitui essa confiança institucional por uma confiança distribuída: várias partes mantêm o registro e qualquer uma pode verificar que a ordem e as marcas temporais não foram alteradas \cite{di2017blockchain}. No exemplo da venda de casas apresentado na seção \ref{sec:introducao}, o papel do cartório passa a ser exercido por uma rede de pares que mantêm cópias do mesmo livro-razão.
+
+Visões gerais complementares sobre a arquitetura, o consenso e o funcionamento técnico do Bitcoin podem ser encontradas em \cite{Zheng2017,Tschorsch2016}.
+
+\subsection{Arquitetura}
+\label{subsec:arquitetura}
+
+A infraestrutura de rede da maior parte dos sistemas \textit{blockchain} públicos é uma rede sobreposta \textit{peer-to-peer} (P2P) construída sobre a Internet, na qual cada nó opera de forma autônoma segundo o mesmo conjunto de regras, que cobre o protocolo de conexão entre pares, o consenso, o processamento de transações e o gerenciamento do livro-razão \cite{Xiao2020}. Diferentemente de um modelo cliente-servidor, em que os papéis são bem definidos, cada participante pode ser ao mesmo tempo cliente, ao emitir transações, e servidor, ao validá-las e finalizá-las \cite{Xiao2020}. Para uma introdução às redes P2P em geral, ver \cite{rocha2004peer}.
+
+A estrutura de dados central é a própria cadeia de blocos, ilustrada na Figura \ref{fig:estrutura_blocos}. Cada bloco reúne um conjunto de transações válidas e um cabeçalho, que contém o \textit{hash} do bloco anterior, a raiz da árvore de Merkle das transações, uma marca temporal e outras informações de configuração; o primeiro bloco, chamado de bloco gênese, é o único sem referência a um bloco anterior \cite{Xiao2020}. Como cada bloco aponta para o anterior por meio de seu \textit{hash}, os blocos ficam encadeados em ordem cronológica e alterar um bloco passado exigiria refazer todos os que o sucedem \cite{nakamoto2008bitcoin}. O mecanismo criptográfico por trás dessa propriedade é detalhado na subseção \ref{subsec:cripto}.
+
+\input{estrutura-blockchain.tex}
+
+Uma transação pode ser vista como um registro público e estático da redistribuição de valor entre remetente e destinatário \cite{Xiao2020}. No modelo do Bitcoin, ela especifica uma lista de entradas e uma lista de saídas: cada entrada reivindica uma saída de transação ainda não gasta (UTXO, \textit{unspent transaction output}) pertencente ao remetente, que a justifica com sua assinatura, e cada saída define quantos \textit{tokens} vão para qual destinatário, de modo que o valor total das saídas é igual ao das entradas reivindicadas \cite{Xiao2020}. Assim, é possível reconstruir a propriedade de qualquer \textit{token} percorrendo a cadeia de assinaturas, e o saldo de uma conta equivale à soma de suas UTXOs \cite{Xiao2020}. Para permitir dividir e combinar valores, as transações têm múltiplas entradas e, em geral, no máximo duas saídas: uma para o pagamento e outra que devolve o troco ao remetente \cite{nakamoto2008bitcoin}.
+
+Transações e blocos se propagam pela rede por \textit{gossip}: ao receber e validar um novo bloco, o nó o anuncia a seus pares, que o requisitam caso ele estenda sua cadeia local, e o processo continua até que todos os nós tenham o bloco \cite{Xiao2020}. A propagação tolera falhas: as novas transações não precisam alcançar todos os nós, bastando atingir muitos deles para entrarem em um bloco em breve, e um nó que perca um bloco o solicita ao receber o seguinte \cite{nakamoto2008bitcoin}.
+
+Quanto ao controle de participação, as redes dividem-se em \textit{permissionless} e \textit{permissioned}. Nas primeiras, também chamadas de públicas, qualquer nó com um pseudônimo válido pode entrar e sair livremente e participar do consenso, em um ambiente geralmente assumido como de larga escala e confiança zero; nas segundas, os participantes precisam ser previamente autorizados e têm identidade revelada, e a governança fica a cargo de uma entidade ou de um consórcio \cite{Xiao2020}. Essa diferença, resumida na Tabela \ref{tab:permissionless}, tem consequências diretas para o desempenho: o corpo de consenso limitado das redes \textit{permissioned} permite protocolos mais eficientes e maior capacidade de transações \cite{Xiao2020}.
+
+\begin{table}[!hbtp]
+    \centering
+    \small
+    \caption{Comparação entre redes \textit{permissionless} e \textit{permissioned}, adaptada de \cite{Xiao2020}.}
+    \label{tab:permissionless}
+    \begin{tabular}{p{1.9cm} p{3cm} p{3cm}}
+        \hline
+        \textbf{Aspecto} & \textbf{\textit{Permissionless}} & \textbf{\textit{Permissioned}} \\
+        \hline
+        Governança & Pública & Privada ou consórcio \\
+        Participação & Livre entrada e saída & Autorizada \\
+        Identidade dos nós & Pseudônima & Revelada \\
+        Tamanho da rede & Milhares ou mais & Dezenas a centenas \\
+        Capacidade (TPS) & Baixa, em geral de unidades a dezenas & Alta, em geral de milhares \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Fundamentos Criptográficos}
+\label{subsec:cripto}
+
+Uma função de \textit{hash} recebe uma entrada de tamanho arbitrário e produz uma saída de tamanho fixo, da qual não é possível derivar a entrada original. Para ser útil ao \textit{Blockchain}, ela deve ter espaços de entrada e de saída grandes e ser praticamente impossível encontrar colisões, isto é, duas entradas distintas que produzam a mesma saída \cite{di2017blockchain}. Exemplos são as funções da família SHA, e o Bitcoin utiliza o SHA-256 em seu mecanismo de prova de trabalho \cite{di2017blockchain,nakamoto2008bitcoin}.
+
+O encadeamento de blocos é construído sobre essa propriedade. Em uma formulação simples, como a apresentada por Di Pierro, cada registro armazena sua marca temporal $t_i$, seus detalhes $d_i$ e um \textit{hash} calculado sobre esses dados e sobre o \textit{hash} do registro anterior:
+\begin{equation}
+    h_i = H(t_i \parallel d_i \parallel h_{i-1}),
+    \label{eq:hash-chain}
+\end{equation}
+em que $H$ é a função de \textit{hash} e $\parallel$ denota concatenação \cite{di2017blockchain}. Como cada $h_i$ depende de $h_{i-1}$, alterar qualquer registro passado muda seu \textit{hash} e invalida todos os seguintes. Qualquer participante pode verificar a integridade da cadeia recalculando os \textit{hashes} a partir do segundo registro e comparando-os com os armazenados: se algum diferir, houve adulteração \cite{di2017blockchain}. Basta que todos conheçam o último \textit{hash} e que algumas partes mantenham cópias da cadeia completa para que a adulteração seja detectável \cite{di2017blockchain}.
+
+As assinaturas digitais complementam o encadeamento ao garantir a autoria das transações. No Bitcoin, uma moeda eletrônica é definida como uma cadeia de assinaturas digitais: cada dono a transfere ao próximo assinando o \textit{hash} da transação anterior e a chave pública do novo dono, e o recebedor pode verificar as assinaturas para confirmar a cadeia de propriedade \cite{nakamoto2008bitcoin}. As assinaturas, porém, não impedem o gasto duplo, pois o recebedor não consegue verificar se um dos donos anteriores assinou uma transação anterior; é por isso que são necessárias a divulgação pública das transações e a concordância da rede sobre uma única ordem de recebimento \cite{nakamoto2008bitcoin}.
+
+Para resumir o conjunto de transações de um bloco, estas são organizadas em uma árvore de Merkle, em que cada folha é rotulada com o \textit{hash} de uma transação e a raiz funciona como um resumo (\textit{digest}) do conjunto, sendo incluída no cabeçalho do bloco \cite{Xiao2020,nakamoto2008bitcoin}. Essa estrutura permite descartar transações antigas, já enterradas sob blocos suficientes, podando ramos da árvore sem quebrar o \textit{hash} do bloco, e permite a verificação simplificada de pagamentos, em que o usuário guarda apenas os cabeçalhos da cadeia mais longa e obtém o ramo de Merkle que liga a transação ao bloco em que ela está registrada \cite{nakamoto2008bitcoin}.
+
+Por fim, a privacidade é preservada ao manter anônimas as chaves públicas: o público vê que alguém envia um valor a outra pessoa, mas sem informação que ligue a transação a uma identidade, e recomenda-se usar um novo par de chaves a cada transação \cite{nakamoto2008bitcoin}.
+
+\subsection{Consenso em Sistemas Distribuídos}
+\label{subsec:consenso}
+
+O consenso é o componente que garante que todos os nós concordem sobre um único histórico de transações sem a ajuda de uma autoridade central \cite{Xiao2020}. Ele é o ponto em que o \textit{Blockchain} mais se relaciona com a teoria de sistemas distribuídos, e por isso convém partir do problema clássico.
+
+\subsubsection{O problema clássico}
+
+No consenso distribuído clássico, $N$ processos independentes iniciam cada um com um valor próprio e se comunicam para que todos os processos não falhos decidam um mesmo valor \cite{Xiao2020}. Os processos podem falhar de duas formas: por parada (\textit{crash}), quando interrompem abruptamente a execução sem retomá-la, ou de forma bizantina, quando passam a agir de maneira arbitrária aparentando normalidade, inclusive enviando mensagens contraditórias para sabotar o consenso \cite{Lamport1982,Xiao2020}. O grau de coordenação da rede também importa: em redes síncronas, as operações são coordenadas em rodadas com limites de tempo claros; em redes parcialmente síncronas, a entrega é garantida, mas com atrasos incertos; e em redes assíncronas não há garantia de atraso além da entrega eventual \cite{Xiao2020}. Fischer, Lynch e Paterson mostraram que, no caso assíncrono, o consenso não pode ser garantido nem com uma única falha por parada, resultado conhecido como impossibilidade FLP \cite{Fischer1985,Xiao2020}.
+
+Um protocolo é tolerante a falhas bizantinas (BFT) se satisfaz quatro requisitos: terminação (todo processo não falho decide uma saída), acordo (todos decidem a mesma saída), validade (se todos começam com a mesma entrada, a saída é essa entrada) e integridade (a decisão foi proposta por algum processo não falho). Para que isso seja possível, a rede deve ter ao menos $N \geq 3f + 1$ processos, em que $f$ é o número de processos bizantinos \cite{Xiao2020}. O PBFT, de Castro e Liskov, foi o primeiro protocolo BFT baseado em replicação de máquina de estados a ganhar reconhecimento por sua praticidade, mas sua complexidade de mensagens é $O(N^2)$, o que limita sua escalabilidade com o tamanho da rede \cite{Castro1999,Xiao2020}.
+
+\subsubsection{Consenso no Blockchain: prova de trabalho}
+
+O \textit{Blockchain} estende esse problema: todo participante pode ser cliente e servidor, e o alvo do consenso é um livro-razão de blocos encadeados, de modo que a responsabilidade do protocolo vai além do consenso clássico e inclui evitar o gasto duplo e a adulteração do histórico \cite{Xiao2020}. Adaptando os requisitos do consenso BFT, Xiao et al. definem que um protocolo de consenso para \textit{blockchain} deve garantir terminação (toda nova transação é descartada ou aceita em um bloco), acordo (toda transação e seu bloco são aceitos ou descartados por todos os nós honestos, com a mesma ordem), validade (se todos recebem a mesma transação ou bloco válido, ele deve ser aceito) e integridade (as transações aceitas são consistentes entre si, sem gasto duplo, e os blocos estão corretamente encadeados em ordem cronológica) \cite{Xiao2020}. Os autores identificam ainda cinco componentes em um protocolo desse tipo: proposta de bloco, propagação de informação, validação de bloco, finalização de bloco e mecanismo de incentivo \cite{Xiao2020}.
+
+O protocolo de consenso de Nakamoto, implementado no Bitcoin, resolve a proposta de bloco por prova de trabalho (\textit{proof of work}, PoW). Cada nó procura um valor, o \textit{nonce}, que faça o \textit{hash} do cabeçalho do bloco ficar abaixo de um alvo de dificuldade, ou seja, começar com um número exigido de bits zero \cite{nakamoto2008bitcoin,Xiao2020}. Encontrar o \textit{nonce} exige um esforço computacional médio exponencial no número de bits zero, mas verificar a solução exige um único \textit{hash} \cite{nakamoto2008bitcoin}. A dificuldade é ajustada dinamicamente para manter um intervalo médio entre blocos, de cerca de dez minutos no Bitcoin, com reajuste a cada 2016 blocos \cite{Xiao2020}. A PoW também resolve o problema da representação na decisão por maioria: em vez de um voto por endereço IP, que seria fácil de fraudar, tem-se na prática um voto por CPU, e a decisão da maioria é representada pela cadeia mais longa, na qual há maior esforço acumulado \cite{nakamoto2008bitcoin}.
+
+Os passos de operação da rede são, resumidamente: as transações são difundidas a todos os nós; cada nó as agrupa em um bloco e trabalha na prova de trabalho; ao encontrá-la, difunde o bloco; os demais o aceitam apenas se todas as suas transações forem válidas e ainda não gastas, e expressam a aceitação trabalhando no bloco seguinte, usando o \textit{hash} do bloco aceito como \textit{hash} anterior \cite{nakamoto2008bitcoin}. Os nós sempre consideram a cadeia mais longa como a correta e continuam a estendê-la \cite{nakamoto2008bitcoin}. Como incentivo, quem gera um bloco recebe novas moedas e as taxas das transações nele incluídas \cite{nakamoto2008bitcoin,Xiao2020}.
+
+Quando dois blocos de mesma altura são propagados ao mesmo tempo, em razão de atrasos na propagação, ocorre uma bifurcação (\textit{fork}): os nós trabalham no primeiro bloco recebido, mas guardam o outro ramo, e o impasse se desfaz quando a próxima prova de trabalho torna um dos ramos mais longo \cite{nakamoto2008bitcoin,Xiao2020}. Por isso, o Bitcoin oferece finalidade probabilística: um bloco aceito ainda pode ser descartado, mas com probabilidade que diminui exponencialmente conforme a cadeia cresce \cite{Xiao2020}.
+
+A segurança do protocolo depende de que a maioria do poder computacional seja honesta. Sendo $p$ a probabilidade de um nó honesto encontrar o próximo bloco e $q$ a de um atacante, a probabilidade de o atacante alcançar a cadeia honesta estando $z$ blocos atrás é
+\begin{equation}
+    q_z =
+    \begin{cases}
+        1, & \text{se } p \leq q, \\
+        (q/p)^z, & \text{se } p > q,
+    \end{cases}
+    \label{eq:attacker}
+\end{equation}
+o que significa que, se $p > q$, a probabilidade cai exponencialmente com $z$ \cite{nakamoto2008bitcoin}. Isso explica por que o destinatário de uma transação espera alguns blocos de confirmação antes de considerá-la definitiva. Por outro lado, a PoW apresenta limitações: o Bitcoin processa cerca de 7 transações por segundo (TPS), contra milhares de TPS em redes de pagamento tradicionais como a VISA, e consome uma grande quantidade de energia \cite{Xiao2020}.
+
+\subsubsection{Alternativas de consenso}
+
+Para superar esses limites, foram propostas alternativas. Na prova de participação (\textit{proof of stake}, PoS), a chance de propor um bloco é proporcional ao valor em moedas (\textit{stake}) do participante, e não ao seu poder computacional, o que evita a disputa por \textit{hashing} e reduz o consumo de energia \cite{Xiao2020}. Os protocolos baseados em BFT, por sua vez, aproveitam o consenso clássico para obter finalidade determinística: uma vez finalizado, o bloco não é mais alterado, o que permite intervalos de bloco menores e maior vazão, ao custo de maior comunicação e da exigência de redes menores e com identidades conhecidas \cite{Xiao2020}. A Tabela \ref{tab:consenso} compara as três famílias. Para um panorama mais amplo de algoritmos de consenso, ver \cite{Li2021}.
+
+\begin{table}[!hbtp]
+    \centering
+    \small
+    \caption{Comparação entre famílias de consenso, adaptada de \cite{Xiao2020}.}
+    \label{tab:consenso}
+    \begin{tabular}{p{1.6cm} p{2.1cm} p{1.9cm} p{2.2cm}}
+        \hline
+        \textbf{Família} & \textbf{Proposta de bloco} & \textbf{Finalidade} & \textbf{Tolerância a falhas} \\
+        \hline
+        PoW & Esforço computacional & Probabilística & Até 50\% do poder computacional \\
+        PoS (baseado em cadeia) & Valor de \textit{stake} & Probabilística & Até 50\% do \textit{stake} \\
+        BFT (ex.: PBFT) & Líder (primário) & Determinística & Até 1/3 dos participantes \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Propriedades Resultantes e \textit{Trade-offs}}
+\label{subsec:propriedades}
+
+A combinação dos mecanismos descritos confere ao \textit{Blockchain} um conjunto de propriedades: descentralização, pois o livro-razão é replicado em todos os participantes sem uma autoridade central; imutabilidade e verificabilidade, pois o encadeamento por \textit{hash} torna detectável qualquer adulteração; rastreabilidade, pois a propriedade de um ativo pode ser reconstruída percorrendo a cadeia de transações assinadas; e, nas redes públicas, auditabilidade por terceiros \cite{di2017blockchain,Xiao2020}.
+
+Essas propriedades, porém, não podem ser maximizadas ao mesmo tempo. Xiao et al. destacam o trilema segurança--descentralização--escalabilidade: o projeto de um protocolo de consenso deve buscar um equilíbrio entre os três objetivos, pois reforçar um tende a prejudicar outro \cite{Xiao2020}. A segurança refere-se à resistência a jogadores maliciosos e à censura; a descentralização, ao perfil da rede em termos de diversidade geográfica, padrão de conectividade e sincronia; e a escalabilidade, à capacidade de manter a eficiência com maior vazão de transações e maior número de nós \cite{Xiao2020}. O Bitcoin, por exemplo, foi projetado para uma rede fracamente sincronizada e por isso depende de mineração e de longos intervalos entre blocos para garantir segurança contra o gasto duplo, ao preço de uma baixa vazão; já os protocolos BFT, pensados para redes \textit{permissioned} pequenas, bem conectadas e com identidades reveladas, atingem vazão maior, mas escalam mal com o número de nós \cite{Xiao2020}. Por esse motivo, não existe um protocolo único adequado a todos os casos, e a possibilidade de combinar componentes de protocolos diferentes permite adaptá-los a necessidades específicas \cite{Xiao2020}.
+
+Em síntese, os fundamentos teóricos do \textit{Blockchain} repousam sobre a criptografia (\textit{hashes}, assinaturas digitais e árvores de Merkle), que torna as adulterações detectáveis, e seus fundamentos arquiteturais, sobre uma rede P2P que replica um livro-razão de blocos encadeados cujo estado único é mantido por um protocolo de consenso tolerante a falhas. As escolhas entre redes públicas ou privadas e entre PoW, PoS e BFT definem como o trilema é resolvido, e são justamente essas escolhas que os requisitos específicos dos setores financeiro e de saúde pressionam, tema da análise desses domínios.

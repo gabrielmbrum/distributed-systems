@@ -1,91 +1,33 @@
 \section{Metodologia}
 \label{sec:metodologia}
 
-A presente pesquisa caracteriza-se como um estudo aplicado de natureza mista, estruturado a partir da integração de uma Revisão de Escopo (\textit{Scoping Review}) com o método de \textit{Design Science Research} (DSR) para o desenvolvimento de um artefato tecnológico. 
+A presente pesquisa caracteriza-se como um estudo com intenção educativa sobre \textit{Blockchain}, tendo sua metodologia inspirada na revisão sistemática de sistemas distribuídos em \textit{edge computing} de Poncinelli Filho \cite{SystRevEdge}. A simplificação metodológica foi sugerida pela professora responsável pela disciplina em que esse artigo foi destinado.
 
-O fluxo metodológico inicia-se com uma etapa iterativa de busca e filtragem sistemática da literatura acadêmica, com o intuito de mapear a fundamentação arquitetural do \textit{Blockchain} e a sua quebra de paradigma na área de sistemas distribuídos. Esta revisão ocorre em um ciclo contínuo de três etapas: (1) busca de artigos base; (2) filtragem de relevância focada em inovações de redes descentralizadas; e (3) escrita e síntese do conhecimento. Uma vez consolidados os princípios de consenso em redes abertas, o ciclo avança para uma análise de domínio, na qual o escopo de busca é direcionado para estudos de caso focados especificamente nas indústrias financeira e da saúde. 
+O fluxo de trabalho empregado neste trabalho é iniciado com a definição das questões de pesquisas do trabalho, as quais são descritas na subseção \ref{subsec:qp}. A partir da definição das questões de pesquisa, então foi empregado o processo de busca, o qual teve seus \textit{prompts} de pesquisa expostos e explicados na subseção \ref{subsec:pb}. Para finalizar a metodologia de busca, a última etapa é constituída pela inclusão e exclusão de estudos com base no potencial de contribuição para resposta das perguntas norteadoras deste trabalho (subseção \ref{subsec:criterios}). A ilustração do \textit{pipeline} de busca e escrita desta pesquisa é exposto na Figura \ref{fig:fluxo_metodologico}.
 
-Por fim, após a finalização da escrita base e do mapeamento contextual de como o \textit{Blockchain} evoluiu para suprir as demandas operacionais destes setores, os resultados teóricos atuam como base de requisitos para o desenvolvimento prático. Fechando o fluxo metodológico via DSR, constrói-se uma plataforma computacional para a visualização de interações de rede \textit{peer-to-peer}, traduzindo os conceitos de descentralização e integridade mapeados na literatura em um ambiente de simulação e validação visual. A Figura \ref{fig:fluxo_metodologico} ilustra o pipeline da metodologia adotada.
+\input{pipeline-busca.tex}
 
-\begin{figure}[!hbtp]
-    \centering
-    \resizebox{0.9\columnwidth}{!}{%
-    \begin{tikzpicture}[
-        % Estilos herdados do seu padrão
-        recntagle/.style={
-            rectangle,
-            rounded corners=3pt,
-            inner sep=6pt,
-            text centered,
-            font=\small\bfseries,
-            draw=black!70,
-            fill=blue!10,
-            line width=0.8pt
-        },
-        title_block/.style={
-            rectangle,
-            rounded corners=3pt,
-            inner sep=4.5pt,
-            text centered,
-            font=\small\bfseries,
-            draw=black!70,
-            fill=blue!10,
-            line width=0.8pt
-        },
-        arrow/.style = {
-            thick, 
-            ->, 
-            >={Stealth[length=2.5mm]}
-        },
-        box_delimitador/.style = {
-            rectangle,
-            rounded corners=8pt,
-            draw=black!70,
-            fill=black!2,
-            line width=0.8pt
-        },
-        sub_block/.style = {
-            rectangle,
-            rounded corners=3pt,
-            inner sep=5pt,
-            text centered,
-            draw=black!70,
-            fill=blue!5,
-            line width=0.7pt,
-            font=\small\bfseries,
-            text width=2.5cm,
-            minimum height=1.2cm
-        }
-    ]
+\subsection{Questões de Pesquisa}
+\label{subsec:qp}
 
-        % ==========================================
-        % FASES 1 E 2: Revisão e Análise de Domínio
-        % ==========================================
-        \node (fases12_box) [box_delimitador, minimum width=10.5cm, minimum height=3.5cm] {};
-        \node (fases12_title) [title_block] at (fases12_box.north) {Fases 1 e 2: Revisão de Escopo e Estudo de Domínio};
+A primeira questão de pesquisa (QP1) "Quais são os fundamentos teóricos e arquiteturais do \textit{Blockchain}?", justifica-se por ser a base conceitual sobre a qual todo o restante do trabalho se apoia. Como o objetivo deste artigo é de natureza educacional, é necessário que o leitor compreenda, antes de qualquer aplicação, como o encadeamento de blocos, o "livro-razão distribuído" e a rede \textit{peer-to-peer} operam em conjunto para garantir a integridade dos registros \cite{di2017blockchain}. Além disso, no contexto da disciplina de Sistemas Distribuídos, essa questão permite situar o \textit{Blockchain} dentro da evolução da área, em que o desafio do consenso deixou de se restringir a ambientes fechados e confiáveis e passou a abranger redes abertas e desprovidas de confiança mútua \cite{Li2021,Xiao2020}.
 
-        % Nós internos do ciclo
-        \node (busca) [sub_block] at ([xshift=-3.3cm, yshift=-0.2cm]fases12_box.center) {1. Busca de Artigos};
-        \node (filtro) [sub_block] at ([xshift=0cm, yshift=-0.2cm]fases12_box.center) {2. Filtragem de Relevância};
-        \node (escrita) [sub_block] at ([xshift=3.3cm, yshift=-0.2cm]fases12_box.center) {3. Escrita e Síntese};
+A segunda questão de pesquisa (QP2) "Como os requisitos dos setores financeiro e de saúde impulsionaram a evolução do \textit{Blockchain}?", é relevante por demonstrar que a tecnologia se desenvolveu em resposta a necessidades vários domínios, e não de forma isolada. O setor financeiro foi escolhido por seu pioneirismo, uma vez que o \textit{Blockchain} surgiu para suportar o \textit{Bitcoin} e posteriormente foi aplicado a ativos digitais, remessas e pagamentos \textit{online} \cite{trendsCrypto}. Já o setor de saúde foi escolhido por seu alinhamento com a área de pesquisa acadêmica do autor e por apresentar requisitos distintos, decorrentes da digitalização de registros médicos e da necessidade de compartilhá-los com segurança entre diferentes ambientes hospitalares \cite{blockSurvey1,blockMed1}.
 
-        % Setas do fluxo principal
-        \draw [arrow] (busca.east) -- (filtro.west);
-        \draw [arrow] (filtro.east) -- (escrita.west);
+\subsection{Processo de Busca}
+\label{subsec:pb}
 
-        % Seta de retorno do ciclo iterativo
-        \draw [arrow] (escrita.south) -- ++(0,-0.6cm) -| node[above, pos=0.25, font=\footnotesize\itshape] {Ciclo Iterativo} (busca.south);
+A pesquisa bibliográfica para a fundamentação e a análise de aplicações foi conduzida durante o mês de outubro de 2026. Para garantir a reprodutibilidade e o rigor acadêmico, o levantamento de literatura concentrou-se exclusivamente em duas das principais bases de dados indexadas da área de Ciência da Computação: \textit{Scopus} e \textit{IEEE Xplore}. A restrição a essas plataformas assegura um filtro inicial de qualidade, priorizando trabalhos validados por revisão por pares (\textit{peer-review}).
 
-        % ==========================================
-        % FASE 3: Desenvolvimento Prático (DSR)
-        % ==========================================
-        \node (fase3) [recntagle, minimum width=8cm, below=1.2cm of fases12_box] {Fase 3: Desenvolvimento Prático da Plataforma (DSR)};
+A construção das \textit{strings} de busca foi adaptada para atender aos escopos das questões de pesquisa. Para cobrir os fundamentos da arquitetura, utilizou-se a estrutura: \texttt{"blockchain" AND ("distributed systems" OR "distributed ledger")}. Para investigar as aplicações práticas e a motivação do uso da tecnologia na saúde, empregou-se a combinação: \texttt{(Blockchain OR "Distributed Ledger") AND (Healthcare OR "Medical Records")}. Buscas semelhantes, focadas em termos da área financeira, foram aplicadas para cobrir as aplicações econômicas.
 
-        % Conexão da Fase teórica para a Fase prática
-        \draw [arrow] (fases12_box.south) -- (fase3.north);
+\subsection{Critérios de Inclusão e Exclusão de Estudos}
+\label{subsec:criterios}
 
-    \end{tikzpicture}%
-    }
-    \caption{Fluxo metodológico da pesquisa, evidenciando o ciclo iterativo de revisão bibliográfica que fundamenta o posterior desenvolvimento prático da plataforma.}
-    \label{fig:fluxo_metodologico}
-\end{figure}
+A triagem dos artigos retornados pelo processo de busca seguiu critérios objetivos para determinar sua inclusão no referencial teórico. Foram incluídos estudos que apresentassem ao menos uma de duas características cruciais: 
+\begin{enumerate}
+    \item A exposição clara dos fundamentos matemáticos e algorítmicos que governam os protocolos \textit{Blockchain} (como funções \textit{hash}, criptografia e mecanismos de consenso).
+    \item Uma contextualização robusta sobre as motivações e os problemas específicos que impulsionaram a adoção da tecnologia no setor de saúde ou financeiro.
+\end{enumerate}
+
+Por sua vez, os critérios de exclusão barraram artigos que não contribuíssem diretamente para a resolução das questões de pesquisa (QP1 e QP2). Foram excluídos trabalhos puramente especulativos, textos sem validação prática na comunidade científica (\textit{preprints} sem \textit{peer-review}) e análises mercadológicas superficiais que carecessem de aprofundamento na arquitetura de sistemas distribuídos.

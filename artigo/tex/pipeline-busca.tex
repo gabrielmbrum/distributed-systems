@@ -1,0 +1,64 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.9\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        % Estilos herdados do seu padrão
+        recntagle/.style={
+            rectangle,
+            rounded corners=3pt,
+            inner sep=6pt,
+            text centered,
+            font=\small\bfseries,
+            draw=black!70,
+            fill=blue!10,
+            line width=0.8pt,
+            text width=4.6cm,
+            minimum height=1.2cm
+        },
+        arrow/.style = {
+            thick, 
+            ->, 
+            >={Stealth[length=2.5mm]}
+        },
+        sub_block/.style = {
+            rectangle,
+            rounded corners=3pt,
+            inner sep=5pt,
+            text centered,
+            draw=black!70,
+            fill=blue!5,
+            line width=0.7pt,
+            font=\small\bfseries,
+            text width=5.8cm,
+            minimum height=1.6cm
+        }
+    ]
+
+        % ==========================================
+        % Definição das Questões de Pesquisa
+        % ==========================================
+        \node (definicao) [recntagle] {Definição das Questões de Pesquisa};
+
+        % Subblocos: questões de pesquisa
+        \node (qp1) [sub_block] at ([xshift=7.2cm, yshift=1.2cm]definicao.center) {QP1: Quais são os fundamentos teóricos e arquiteturais do \textit{Blockchain}?};
+        \node (qp2) [sub_block] at ([xshift=7.2cm, yshift=-1.2cm]definicao.center) {QP2: Como os requisitos dos setores financeiro e de saúde impulsionaram a evolução do \textit{Blockchain}?};
+
+        % Setas do bloco de definição para as questões de pesquisa
+        \draw [arrow] (definicao.east) -- ++(0.9cm,0) |- (qp1.west);
+        \draw [arrow] (definicao.east) -- ++(0.9cm,0) |- (qp2.west);
+
+        % ==========================================
+        % Fluxo de pesquisa
+        % ==========================================
+        \node (busca) [recntagle, below=1.4cm of definicao] {Processo de Busca};
+        \node (criterios) [recntagle, below=1.4cm of busca] {Critérios de Inclusão e Exclusão de Estudos};
+
+        % Setas do fluxo principal
+        \draw [arrow] (definicao.south) -- (busca.north);
+        \draw [arrow] (busca.south) -- (criterios.north);
+
+    \end{tikzpicture}%
+    }
+    \caption{Fluxo metodológico da pesquisa: a definição das questões de pesquisa (QP1 e QP2) orienta o processo de busca, seguido pela aplicação dos critérios de inclusão e exclusão de estudos.}
+    \label{fig:fluxo_metodologico}
+\end{figure}
